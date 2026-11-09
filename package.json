@@ -1,0 +1,22 @@
+{
+    "name":  "cdac-prephub",
+    "version":  "0.1.0",
+    "private":  true,
+    "description":  "CDAC PrepHub learning platform monorepo",
+    "workspaces":  [
+                       "apps/frontend",
+                       "apps/backend"
+                   ],
+    "engines":  {
+                    "node":  "^22.22.3 || ^24.15.0 || ^26.0.0",
+                    "npm":  "\u003e=10.9.0"
+                },
+    "scripts":  {
+                    "dev:frontend":  "npm run start --workspace @cdac-prephub/frontend",
+                    "dev:backend":  "npm run start:dev --workspace @cdac-prephub/backend",
+                    "build:frontend":  "npm run build --workspace @cdac-prephub/frontend",
+                    "build:backend":  "npm run build --workspace @cdac-prephub/backend",
+                    "test:backend":  "npm run test --workspace @cdac-prephub/backend",
+                    "migration:run":  "npm run migration:run --workspace @cdac-prephub/backend"
+                }
+}
