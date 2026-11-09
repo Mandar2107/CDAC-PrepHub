@@ -9,7 +9,7 @@ CDAC PrepHub is a commercial preparation platform for CDAC entrance examinations
 - `docker-compose.yml`: local PostgreSQL service.
 - `.env.example`: required local configuration keys.
 
-The dashboards are layout shells; their metrics and content are not connected to data APIs yet. The public marketing pages, password recovery, student/course management, payment processing, AI features, learning content and dynamic student experience manager are not implemented in this initial foundation.
+The dashboards are layout shells; their metrics and content are not connected to data APIs yet. The local development build includes fixed demo accounts to preview each dashboard without a database; these credentials and the demo sign-in are excluded from the production build. The public marketing pages, password recovery, student/course management, payment processing, AI features, learning content and dynamic student experience manager are not implemented in this initial foundation.
 
 ## Prerequisites
 

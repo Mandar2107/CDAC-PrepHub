@@ -3,7 +3,8 @@ import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
-import { AuthService } from './auth.service';
+import { AuthService, UserRole } from './auth.service';
+import { environment } from '../../environments/environment';
 
 @Component({
   standalone: true,
@@ -18,7 +19,9 @@ import { AuthService } from './auth.service';
         @if (error()) { <div class="auth-error" role="alert">{{ error() }}</div> }
         <button class="auth-submit" type="submit" [disabled]="loading() || form.invalid">{{ loading() ? 'Please wait…' : registering() ? 'Create account' : 'Sign in' }} <span>→</span></button>
       </form>
-      <div class="auth-switch">{{ registering() ? 'Already have an account?' : 'New to PrepHub?' }} <button type="button" (click)="toggleMode()">{{ registering() ? 'Sign in' : 'Create an account' }}</button></div><div class="auth-security"><span>♧</span> Your account is protected with secure sign-in.</div>
+      <div class="auth-switch">{{ registering() ? 'Already have an account?' : 'New to PrepHub?' }} <button type="button" (click)="toggleMode()">{{ registering() ? 'Sign in' : 'Create an account' }}</button></div>
+      @if (demoAuthEnabled() && !registering()) { <section class="demo-accounts"><b>Local preview accounts</b><small>Development only · no real student data</small>@for (account of demoAccounts; track account.id) { <div><span><strong>{{ account.role === 'student' ? 'Student' : 'Admin' }}</strong><code>{{ account.email }}</code><code>{{ account.password }}</code></span><button type="button" (click)="useDemo(account.role)">Use</button></div> }</section> }
+      <div class="auth-security"><span>♧</span> Your account is protected with secure sign-in.</div>
     </div></section></main>
   `,
 })
@@ -30,6 +33,8 @@ export class LoginComponent {
   readonly registering = signal(false);
   readonly loading = signal(false);
   readonly error = signal('');
+  readonly demoAuthEnabled = signal(environment.devDashboardPreview && environment.demoAccounts.length > 0);
+  readonly demoAccounts = environment.demoAccounts;
   readonly form = this.fb.nonNullable.group({
     name: ['', [Validators.minLength(2), Validators.maxLength(120)]],
     email: ['', [Validators.required, Validators.email, Validators.maxLength(254)]],
@@ -43,6 +48,15 @@ export class LoginComponent {
     this.form.controls.name.setValidators(this.registering() ? [Validators.required, Validators.minLength(2), Validators.maxLength(120)] : []);
     this.form.controls.name.updateValueAndValidity();
     this.form.controls.password.updateValueAndValidity();
+  }
+
+  useDemo(role: UserRole): void {
+    if (!environment.devDashboardPreview) return;
+    if (this.registering()) this.toggleMode();
+    const account = environment.demoAccounts.find((candidate) => candidate.role === role);
+    if (!account) return;
+    this.error.set('');
+    this.form.patchValue({ email: account.email, password: account.password });
   }
 
   async submit(): Promise<void> {

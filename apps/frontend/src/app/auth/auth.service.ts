@@ -19,6 +19,15 @@ export class AuthService {
   private refreshRequest: Observable<SessionResponse> | null = null;
 
   login(payload: LoginPayload): Observable<SessionUser> {
+    if (environment.devDashboardPreview) {
+      const account = environment.demoAccounts.find((candidate) => candidate.email === payload.email.trim().toLowerCase() && candidate.password === payload.password);
+      if (account) {
+        const user: SessionUser = { id: account.id, name: account.name, email: account.email, role: account.role };
+        this.user.set(user);
+        this.accessToken.set('development-preview-token');
+        return of(user);
+      }
+    }
     return this.http.post<SessionResponse>(`${API}/auth/login`, payload, { withCredentials: true }).pipe(map((session) => this.apply(session)));
   }
 
@@ -41,6 +50,7 @@ export class AuthService {
   }
 
   async logout(): Promise<void> {
+    if (this.accessToken() === 'development-preview-token') { this.clear(); return; }
     try { await firstValueFrom(this.http.post<void>(`${API}/auth/logout`, {}, { withCredentials: true })); }
     finally { this.clear(); }
   }

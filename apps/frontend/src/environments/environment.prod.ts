@@ -1,1 +1,3 @@
-export const environment = { apiBaseUrl: '/api' };
+import { AppEnvironment } from './environment.model';
+
+export const environment: AppEnvironment = { apiBaseUrl: '/api', devDashboardPreview: false, demoAccounts: [] };
